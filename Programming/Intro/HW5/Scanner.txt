@@ -1,0 +1,108 @@
+﻿import java.io.*;
+import java.lang.reflect.Array;
+import java.nio.charset.CharacterCodingException;
+import java.util.ArrayList;
+
+public class FastScanner {
+    public byte[] fileInArray, buffer;
+    private InputStream stream = System.in;
+    private int pline, pcolumn, pos = 0, len;
+    private ArrayList<ArrayList<String>> matrix = new ArrayList<>();
+
+    public FastScanner(String s) throws IOException { //constructor
+        File f = new File(s);
+        int size = (int) f.length(); //размер файла в байтах;
+        fileInArray = new byte[size]; //массив байтов
+        FileInputStream file = new FileInputStream(s); //откуда читать
+        file.read(fileInArray);
+        spliting();
+    }
+
+    public FastScanner() throws IOException {
+        readFastScannerStream();
+    }
+
+    private void readFastScannerStream() throws IOException, ArrayIndexOutOfBoundsException {
+        ArrayList<Integer> bytesList = new ArrayList<Integer>();
+        buffer = new byte[1024 * 12 * 8];
+        int a = readBytes();
+        while (a != -1) {
+            bytesList.add(a);
+            do{
+                a = readBytes();
+            } while (a==0);
+        }
+        fileInArray = new byte[bytesList.size()];
+        for (int i = 0; i < bytesList.size(); i++) {
+            fileInArray[i] = (byte) ((int) bytesList.get(i));
+        }
+        spliting();
+    }
+
+    private int readBytes() throws IOException {
+        if (pos < len)
+            return buffer[pos++];
+        len = stream.read(buffer);
+        pos = 0;
+        return len == -1 ? -1 : buffer[pos++];
+    }
+
+    private ArrayList<String> splitNewLine(String need) throws ArrayIndexOutOfBoundsException {
+        StringBuilder sans = new StringBuilder();
+        ArrayList<String> returned = new ArrayList<>();
+        for (int i = 0; i < need.length() - 1; i++) {
+            if (need.charAt(i) == '\r' && need.charAt(i + 1) == '\n') {
+                String s = new String(sans);
+                i++;
+                returned.add(s);
+                sans.setLength(0);
+            } else {
+                sans.append(need.charAt(i));
+            }
+        }
+        return returned;
+    }
+
+    private void spliting() throws UnsupportedEncodingException, ArrayIndexOutOfBoundsException {
+        matrix.clear();
+        String st = new String(fileInArray, "UTF-8");
+        ArrayList<String> source = splitNewLine(st); //сюда надо строчку пихать одну
+        for (int i = 0; i < source.size(); i++) {
+            ArrayList<String> line = new ArrayList<>();
+            if (source.get(i).length() == 0) {
+                line.add(source.get(i));
+                matrix.add(line);
+                continue;
+            }
+            String[] splited = source.get(i).split(" ");
+            for (int j = 0; j < splited.length; j++) {
+                line.add(splited[j]);
+            }
+            matrix.add(line);
+        }
+    }
+
+    public boolean hasNextLine() {
+        if (pline >= matrix.size()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean needChangeLine() throws ArrayIndexOutOfBoundsException {
+        if (pcolumn >= matrix.get(pline).size()) {
+            pcolumn = 0;
+            pline++;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public String nextElement() throws ArrayIndexOutOfBoundsException {
+        pcolumn++;
+        return matrix.get(pline).get(pcolumn - 1);
+    }
+}
+

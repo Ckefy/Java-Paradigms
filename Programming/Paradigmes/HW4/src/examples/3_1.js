@@ -1,0 +1,55 @@
+"use strict";
+
+lecture("3. More Features");
+chapter("Error handling");
+section("Standard errors");
+
+try {
+    throw new Error("Custom error message");
+} catch (e) {
+    println("Got exception: " + e + " (" + typeof(e) + ")");
+}
+println();
+
+
+section("Everything is throwable");
+
+try {
+    throw 1;
+} catch (e) {
+    println("Got exception: " + e + " (" + typeof(e) + ")");
+}
+println();
+
+try {
+    throw {name: "my error"};
+} catch (e) {
+    println("Got exception: " + e.name + " (" + typeof(e) + ")");
+}
+println();
+
+try {
+    throw undefined;
+} catch (e) {
+    println("Got exception: " + e);
+}
+println();
+
+
+section("Custom errors");
+
+function CustomError(message) {
+    this.message = message;
+}
+CustomError.prototype = Object.create(Error.prototype);
+CustomError.prototype.name = "CustomError";
+CustomError.prototype.constructor = CustomError;
+
+try {
+    throw new CustomError("Custom error message");
+} catch (e) {
+    println("Got exception: " + e);
+    println("io CustomError: " + (e instanceof CustomError));
+    println("io Error:     " + (e instanceof Error));
+}
+println();
